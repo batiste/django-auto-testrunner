@@ -54,6 +54,8 @@ def listen():
             if not args[0].startswith('./'):
                 args[0] = './' + args[0]
             args.append("--now")
+            # I call a subprocess because Django doesn't run if
+            # not in the main thread
             subprocess.call(args)
             print
             empty_queue()
