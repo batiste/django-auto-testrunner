@@ -53,7 +53,6 @@ def listen():
             # in case it's run with python run.py
             if not args[0].startswith('./'):
                 args[0] = './' + args[0]
-            print args
             args.append("--now")
             subprocess.call(args)
             print
