@@ -14,32 +14,33 @@ import subprocess
 def listen():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("settings", help="Django settings")
-    parser.add_argument("--path", help="Path where to observe and where to search for the setting file", default='.')
-    parser.add_argument("--tests", help="Test application list", default='')
-    parser.add_argument("--now", help="Run test now", action='store_const', const=True)
+    parser.add_argument("runner_class", 
+        help="Complete path to the test runner class", 
+        default='')
+    parser.add_argument("--path", 
+        help="Path where to observe file changes, this value is added to sys.path", 
+        default='.')
+    parser.add_argument("--params", 
+        help="Params to pass to the test runner", 
+        default='')
+    parser.add_argument("--now", 
+        help="Run test now", action='store_const', 
+        const=True)
     args = parser.parse_args()
 
     if args.path and args.path is not '.':
         sys.path.append(args.path)
 
-    runner = None
-    if args.settings:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", args.settings)
-        from django.conf import settings
-        module, cls = settings.TEST_RUNNER.rsplit('.' , 1)
-        module = importlib.import_module(module)
-        runner = getattr(module, cls)()
+    mod, cls = args.runner_class.rsplit('.', 1)
+    module = importlib.import_module(mod)
+    runner = getattr(module, cls)()
 
     if args.now:
         try:
-            return runner.run_tests(args.tests.split(","))
+            #args.params.split(",")
+            return runner.run_tests()
         except KeyboardInterrupt:
             return
-    else:
-        print "Welcome to Django auto test runner"
-        print "Using %s" % settings.TEST_RUNNER
-        print
 
     class EventHandler(FileSystemEventHandler):
 
